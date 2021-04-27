@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from 'react-native';
-import {AuthService} from '../../services';
+import {AuthService, CallService} from '../../services';
 import {users} from '../../config';
 
 export default class AuthScreen extends PureComponent {
@@ -18,13 +18,18 @@ export default class AuthScreen extends PureComponent {
   setIsLogging = isLogging => this.setState({isLogging});
 
   login = currentUser => {
-    const _onSuccessLogin = () => {
+    const _onSuccessLogin = async () => {
       const {navigation} = this.props;
-      const opponentsIds = users
-        .filter(opponent => opponent.id !== currentUser.id)
-        .map(opponent => opponent.id);
-
-      navigation.push('VideoScreen', {opponentsIds});
+      const searchParams = {tags: ['apple']};
+      const data = await AuthService.getUser(searchParams);
+      const opponentsIds = data.items
+        .filter(opponent => opponent.user.id !== currentUser.id)
+        .map(opponent => opponent.user.id);
+      const userCall = data.items
+        .filter(opponent => opponent.user.id !== currentUser.id)
+        .map(opponent => opponent.user);
+      console.log(userCall);
+      navigation.push('VideoScreen', {opponentsIds, userCall});
     };
 
     const _onFailLogin = (error = {}) => {

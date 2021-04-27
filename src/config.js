@@ -38,25 +38,4 @@ export const users = [
     password: 'videouser4',
     color: '#056a96',
   },
-  {
-    id: 590583,
-    name: 'Dexter',
-    login: 'videouser4',
-    password: 'videouser4',
-    color: '#056a96',
-  },
-  {
-    id: 590583,
-    name: 'Dexter',
-    login: 'videouser4',
-    password: 'videouser4',
-    color: '#056a96',
-  },
-  {
-    id: 590583,
-    name: 'Dexter',
-    login: 'videouser4',
-    password: 'videouser4',
-    color: '#056a96',
-  },
 ];

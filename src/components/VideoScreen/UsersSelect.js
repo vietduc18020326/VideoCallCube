@@ -1,7 +1,5 @@
 import React from 'react';
 import {View, Text, StyleSheet, FlatList, TouchableOpacity} from 'react-native';
-import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
-import {CallService, AuthService} from '../../services';
 import Call from './Call';
 import InboxSeparator from '../InboxSeparator';
 
@@ -14,8 +12,10 @@ export default ({
   closeSelect,
   initRemoteStreams,
   setLocalStream,
+  userCall,
 }) => {
   if (!isActiveSelect) {
+    console.log(opponentsIds);
     return null;
   }
 
@@ -33,6 +33,8 @@ export default ({
             closeSelect={closeSelect}
             initRemoteStreams={initRemoteStreams}
             setLocalStream={setLocalStream}
+            isActiveSelect={isActiveSelect}
+            userCall={userCall}
           />
         )}
         ItemSeparatorComponent={InboxSeparator}

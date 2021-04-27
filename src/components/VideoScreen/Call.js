@@ -1,23 +1,31 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {TouchableOpacity, Text, StyleSheet, View} from 'react-native';
+import {data} from 'react-native-connectycube';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
-import {CallService, AuthService} from '../../services';
+import {CallService} from '../../services';
 
 export default ({
   selectedUsersIds,
-  image = require('../../../assets/avatar.jpg'),
   id,
+  userCall,
   closeSelect,
   initRemoteStreams,
   setLocalStream,
+  isActiveSelect,
 }) => {
-  const user = CallService.getUserById(id);
+  // const [user, setUser] = useState('');
+  // useEffect(() => {
+  //   if (isActiveSelect) {
+  //     const getUser = async () => {
+  //       const data = await CallService.getUserById(id);
+  //       setUser(data.full_name);
+  //     };
+  //     getUser();
+  //   }
+  // }, [user]);
+  const user = CallService.getUserById(id, userCall).full_name;
   const selected = selectedUsersIds.some(userId => id === userId);
-  // const type = selected
-  //   ? 'radio-button-checked'
-  //   : 'radio-button-unchecked';
   const type = 'call';
-  //const onPress = selected ? unselectUser : selectUser;
   const onPress = async id => {
     //Create new user
     // const userProfile = {
@@ -31,14 +39,12 @@ export default ({
     //   custom_data: JSON.stringify({middle_name: 'Baroibeo'}),
     // };
     // AuthService.create(userProfile);
-
     //Get user has tags apple
     // const searchParams = {tags: ['apple']};
     // const data = await AuthService.getUser(searchParams);
-    // console.log(data.items);
-
+    // console.log(data.items[1].user);
     selectedUsersIds.push(id);
-    console.log(selectedUsersIds);
+    console.log(id);
     closeSelect();
     initRemoteStreams(selectedUsersIds);
     CallService.startCall(selectedUsersIds).then(setLocalStream);
@@ -46,7 +52,7 @@ export default ({
 
   return (
     <View style={styles.container}>
-      <Text style={styles.userName}>{user.name}</Text>
+      <Text style={styles.userName}>{user}</Text>
       <TouchableOpacity style={styles.btnCall} onPress={() => onPress(id)}>
         <MaterialIcon name={type} size={20} color="white" />
       </TouchableOpacity>

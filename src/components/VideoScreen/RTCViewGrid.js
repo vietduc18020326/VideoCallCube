@@ -1,11 +1,12 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {View, StyleSheet} from 'react-native';
 import {RTCView} from 'react-native-connectycube';
 import {CallService} from '../../services';
 import CallingLoader from './CallingLoader';
 
-export default ({streams, isActiveSelect}) => {
+export default ({streams, isActiveSelect, userCall}) => {
   const style = isActiveSelect ? styles.whiteView : styles.blackView;
+  // const name = CallService.getUserById(streams[0].userId, userCall, 'name');
   const RTCViewRendered = ({userId, stream}) => {
     if (stream) {
       return (
@@ -20,7 +21,9 @@ export default ({streams, isActiveSelect}) => {
 
     return (
       <View style={style}>
-        <CallingLoader name={CallService.getUserById(userId, 'name')} />
+        <CallingLoader
+          name={CallService.getUserById(userId, userCall, 'name')}
+        />
       </View>
     );
   };

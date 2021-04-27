@@ -13,6 +13,7 @@ export default class VideoScreen extends React.Component {
 
     this._session = null;
     this.opponentsIds = props.navigation.getParam('opponentsIds');
+    this.userCall = props.navigation.getParam('userCall');
 
     this.state = {
       localStream: null,
@@ -151,13 +152,23 @@ export default class VideoScreen extends React.Component {
   };
 
   _onAcceptCallListener = (session, userId, extension) => {
-    CallService.processOnAcceptCallListener(session, userId, extension)
+    CallService.processOnAcceptCallListener(
+      session,
+      userId,
+      this.userCall,
+      extension,
+    )
       .then(this.setOnCall)
       .catch(this.hideInomingCallModal);
   };
 
   _onRejectCallListener = (session, userId, extension) => {
-    CallService.processOnRejectCallListener(session, userId, extension)
+    CallService.processOnRejectCallListener(
+      session,
+      userId,
+      this.userCall,
+      extension,
+    )
       .then(() => this.removeRemoteStream(userId))
       .catch(this.hideInomingCallModal);
   };
@@ -165,7 +176,11 @@ export default class VideoScreen extends React.Component {
   _onStopCallListener = (session, userId, extension) => {
     const isStoppedByInitiator = session.initiatorID === userId;
 
-    CallService.processOnStopCallListener(userId, isStoppedByInitiator)
+    CallService.processOnStopCallListener(
+      userId,
+      this.userCall,
+      isStoppedByInitiator,
+    )
       .then(() => {
         if (isStoppedByInitiator) {
           this.resetState();
@@ -177,7 +192,7 @@ export default class VideoScreen extends React.Component {
   };
 
   _onUserNotAnswerListener = (session, userId) => {
-    CallService.processOnUserNotAnswerListener(userId)
+    CallService.processOnUserNotAnswerListener(userId, this.userCall)
       .then(() => this.removeRemoteStream(userId))
       .catch(this.hideInomingCallModal);
   };
@@ -202,7 +217,11 @@ export default class VideoScreen extends React.Component {
     } = this.state;
 
     const initiatorName = isIncomingCall
-      ? CallService.getUserById(this._session.initiatorID, 'name')
+      ? CallService.getUserById(
+          this._session.initiatorID,
+          this.userCall,
+          'name',
+        )
       : '';
     const localStreamItem = localStream
       ? [{userId: 'localStream', stream: localStream}]
@@ -223,8 +242,13 @@ export default class VideoScreen extends React.Component {
           closeSelect={this.closeSelect}
           initRemoteStreams={this.initRemoteStreams}
           setLocalStream={this.setLocalStream}
+          userCall={this.userCall}
         />
-        <RTCViewGrid streams={streams} isActiveSelect={isActiveSelect} />
+        <RTCViewGrid
+          streams={streams}
+          isActiveSelect={isActiveSelect}
+          userCall={this.userCall}
+        />
 
         <ToolBar
           selectedUsersIds={selectedUsersIds}

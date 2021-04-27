@@ -1,12 +1,13 @@
-import { Platform, ToastAndroid } from 'react-native';
+import {Platform, ToastAndroid} from 'react-native';
 import Toast from 'react-native-simple-toast';
 import ConnectyCube from 'react-native-connectycube';
 import InCallManager from 'react-native-incall-manager';
 import Sound from 'react-native-sound';
-import { users } from '../config';
+// import {users} from '../config';
+import {AuthService} from './index';
 
 export default class CallService {
-  static MEDIA_OPTIONS = { audio: true, video: { facingMode: 'user' } };
+  static MEDIA_OPTIONS = {audio: true, video: {facingMode: 'user'}};
 
   _session = null;
   mediaDevices = [];
@@ -21,11 +22,15 @@ export default class CallService {
     commonToast.showWithGravity(text, Toast.LONG, Toast.TOP);
   };
 
-  getUserById = (userId, key) => {
+  getUserById = (userId, users, key) => {
+    // const searchParams = {tags: ['apple']};
+    // const data = await AuthService.getUser(searchParams);
+
     const user = users.find(user => user.id == userId);
 
     if (typeof key === 'string') {
-      return user[key];
+      const name = user.full_name;
+      return name;
     }
 
     return user;
@@ -97,12 +102,12 @@ export default class CallService {
 
   setSpeakerphoneOn = flag => InCallManager.setSpeakerphoneOn(flag);
 
-  processOnUserNotAnswerListener(userId) {
+  processOnUserNotAnswerListener(userId, users) {
     return new Promise((resolve, reject) => {
       if (!this._session) {
         reject();
       } else {
-        const userName = this.getUserById(userId, 'name');
+        const userName = this.getUserById(userId, users, 'name');
         const message = `${userName} did not answer`;
 
         this.showToast(message);
@@ -119,7 +124,7 @@ export default class CallService {
       }
 
       if (this._session) {
-        this.rejectCall(session, { busy: true });
+        this.rejectCall(session, {busy: true});
         reject();
       }
 
@@ -129,7 +134,7 @@ export default class CallService {
     });
   }
 
-  processOnAcceptCallListener(session, userId, extension = {}) {
+  processOnAcceptCallListener(session, userId, users, extension = {}) {
     return new Promise((resolve, reject) => {
       if (userId === session.currentUserID) {
         this._session = null;
@@ -137,7 +142,7 @@ export default class CallService {
 
         reject();
       } else {
-        const userName = this.getUserById(userId, 'name');
+        const userName = this.getUserById(userId, users, 'name');
         const message = `${userName} has accepted the call`;
 
         this.showToast(message);
@@ -148,7 +153,7 @@ export default class CallService {
     });
   }
 
-  processOnRejectCallListener(session, userId, extension = {}) {
+  processOnRejectCallListener(session, userId, users, extension = {}) {
     return new Promise((resolve, reject) => {
       if (userId === session.currentUserID) {
         this._session = null;
@@ -156,7 +161,7 @@ export default class CallService {
 
         reject();
       } else {
-        const userName = this.getUserById(userId, 'name');
+        const userName = this.getUserById(userId, users, 'name');
         const message = extension.busy
           ? `${userName} is busy`
           : `${userName} rejected the call request`;
@@ -168,17 +173,17 @@ export default class CallService {
     });
   }
 
-  processOnStopCallListener(userId, isInitiator) {
+  processOnStopCallListener(userId, users, isInitiator) {
     return new Promise((resolve, reject) => {
       this.stopSounds();
 
       if (!this._session) {
         reject();
       } else {
-        const userName = this.getUserById(userId, 'name');
+        const userName = this.getUserById(userId, users, 'name');
         const message = `${userName} has ${
           isInitiator ? 'stopped' : 'left'
-          } the call`;
+        } the call`;
 
         this.showToast(message);
 
